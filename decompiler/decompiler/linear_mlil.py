@@ -128,7 +128,7 @@ class LinearMLILView(TokenizedTextView):
         to_visit = [
             (n, 0)
             for header, n in sorted(
-                ast._regions.items(), key=cmp_to_key(lambda i, j: 1 if ast.reaching_conditions.get((i[0], j[0])) is None else 1 if i.start > j.start else -1), reverse=True
+                ast._regions.items(), key=cmp_to_key(lambda i, j: 1 if ast.reaching_conditions.get((i[0], j[0])) is None else 1 if i[0].start > j[0].start else -1), reverse=True
             )
         ]
 

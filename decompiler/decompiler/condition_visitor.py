@@ -2,7 +2,7 @@ from .bnilvisitor import BNILVisitor
 
 from binaryninja import (Variable, VariableSourceType)
 
-from z3 import (BitVec, And, Or, Not, Solver, simplify, Extract, UGT, ULE, Array, BitVecSort, Concat, Bool)
+from z3 import (BitVec, And, Or, Not, Solver, simplify, Extract, UGT, ULE, UGE, ULT, Array, BitVecSort, Concat, Bool)
 
 def make_variable(var: Variable):
     if var.name == '':
@@ -45,6 +45,11 @@ class ConditionVisitor(BNILVisitor):
 
         return left > right
 
+    def visit_MLIL_CMP_SLT(self, expr):
+        left, right = self.visit_both_sides(expr)
+
+        return left < right
+
     def visit_MLIL_CMP_SGE(self, expr):
         left, right = self.visit_both_sides(expr)
 
@@ -59,6 +64,16 @@ class ConditionVisitor(BNILVisitor):
         left, right = self.visit_both_sides(expr)
 
         return ULE(left, right)
+
+    def visit_MLIL_CMP_UGE(self, expr):
+        left, right = self.visit_both_sides(expr)
+
+        return UGE(left, right)
+
+    def visit_MLIL_CMP_ULT(self, expr):
+        left, right = self.visit_both_sides(expr)
+
+        return ULT(left, right)
 
     def visit_MLIL_LOAD(self, expr):
         src = self.visit(expr.src)

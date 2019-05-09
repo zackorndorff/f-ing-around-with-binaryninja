@@ -27,7 +27,45 @@ class ConstraintVisitor:
         return value
 
     def visit_BoolRef(self, expr):
-        if expr.num_args() == 2:
+        if expr.num_args() > 2 and expr.decl().name() in ('and', 'or'):
+            # Not sure if we need to do DeMorgan's or something here, so bail out
+            if self._in_not:
+                raise NotImplementedError()
+            operation = f"{expr.decl()!s}"
+            visited = [self.visit(expr.arg(i)) for i in range(expr.num_args())]
+
+            tokens = []
+            tokens.append(
+                    InstructionTextToken(
+                        InstructionTextTokenType.TextToken,
+                        "("
+                    )
+            )
+            for idx, item in enumerate(visited):
+                if idx != 0:
+                    tokens.append(InstructionTextToken(
+                            InstructionTextTokenType.TextToken,
+                            f" {operation} "
+                    ))
+                tokens.append(InstructionTextToken(
+                                InstructionTextTokenType.TextToken,
+                                "("
+                ))
+                tokens.extend(item)
+                tokens.append(InstructionTextToken(
+                                InstructionTextTokenType.TextToken,
+                                ")"
+                ))
+            tokens.append(
+                    InstructionTextToken(
+                        InstructionTextTokenType.TextToken,
+                        ")"
+                    )
+            )
+
+            return tokens
+
+        elif expr.num_args() == 2:
             if self._in_not:
                 operation = negations.get(f"{expr.decl()!s}")
                 if operation is None:
